@@ -89,14 +89,46 @@ vector<double> selection(vector<double> pop)
     return select;
 }
 
+vector<double> crossover(vector<double> pop)
+{
+    vector<double> cross;
+
+    for(int i = 0; i < CROSSOVER; i++)
+    {
+        int idx1 = rand() % SELECTION;
+        int idx2 = rand() % SELECTION;
+
+        double ratio = generate_double(0.0, 1.0);
+
+        double new_chromosome = (pop.at(idx2) - pop.at(idx1)) * ratio + pop.at(idx1);
+        cross.push_back(new_chromosome);
+    }
+  return cross;
+}
+vector<double> mutation(vector<double> pop)
+{
+    vector<double> mutate;
+
+    for(int i = 0; i < MUTATION; i++)
+    {
+      int idx1 = rand() % SELECTION;
+
+      double new_chromosome = pop.at(idx1) + generate_double(-0.1, 0.1) * pop.at(idx1);
+      mutate.push_back(new_chromosome);
+    }
+    return mutate;
+}
 
 int main()
 {
     srand(time(NULL));
     vector<double> population = generate_population();
     vector<double> select = selection(population);
-    print_population(population);
+    vector<double> cross = crossover(select);
+    vector<double> mutate = mutation(select);
+    /*print_population(population);
     print_population(select);
+    print_population(cross);
+    print_population(mutate);
+    */
 }
-
-

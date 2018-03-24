@@ -18,17 +18,19 @@ const int CROSSOVER = 3;
 const int MUTATION = 3;
 
 const double LOWER_LIMIT = 0.0;
-const double UPPER_LIMIT = 10.0;
+const double UPPER_LIMIT = 5.0;
+
+const int ITERATIONS = 1000000;
 
 ///random, better than rand()
-random_device rd;  //Will be used to obtain a seed for the random number engine
-mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+random_device rd;
+mt19937 gen(rd());
 uniform_real_distribution<> dis(0.0, 1.0);
 std::exponential_distribution<> dis_exp(1);
 
 double cost_function(double x)
 {
-    return (abs(x*x - NUMBER*NUMBER));
+    return (abs(x*x - NUMBER));
 }
 double generate_double(double from , double to)
 {
@@ -51,7 +53,7 @@ void print_population(vector<double> p)
         cout << p.at(i) << " ";
     cout << endl;
 }
-///tournament style selection, it does not take already selected chromosome
+///tournament style selection, it does not take already selected chromosomes
 vector<double> selection(vector<double> pop)
 {
     ///keeps indexes of already selected chromosomes
@@ -71,7 +73,6 @@ vector<double> selection(vector<double> pop)
         do{
             idx2 = rand() % POPULATION_SIZE;
         }while(already_selected.count(idx2) != 0);
-
 
         int better_chrom;
 
@@ -118,14 +119,38 @@ vector<double> mutation(vector<double> pop)
     }
     return mutate;
 }
+void make_new_population(vector<double> &population, vector<double> select, vector<double> cross, vector<double> mutate)
+{
+    for(int i = 0; i < SELECTION; i++)
+        population.at(i) = select.at(i);
 
+    for(int i = 0; i < CROSSOVER; i++)
+          population.at(i) = cross.at(i);
+
+    for(int i = 0; i < MUTATION; i++)
+        population.at(i) = cross.at(i);
+}
 int main()
 {
     srand(time(NULL));
     vector<double> population = generate_population();
-    vector<double> select = selection(population);
-    vector<double> cross = crossover(select);
-    vector<double> mutate = mutation(select);
+
+    cout << "Starting population... \n";
+    print_population(population);
+
+    for(int j = 0; j < ITERATIONS; j++)
+    {
+        vector<double> select = selection(population);
+        vector<double> cross = crossover(select);
+        vector<double> mutate = mutation(select);
+
+        make_new_population(population, select, cross, mutate);
+    }
+    print_population(population);
+
+    sort(population.begin(), population.end());
+    double best_fit = population.at(0);
+    cout << "Best fit: " << best_fit << endl;
     /*print_population(population);
     print_population(select);
     print_population(cross);
